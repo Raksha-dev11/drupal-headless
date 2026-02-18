@@ -1,6 +1,6 @@
 FROM php:8.2-apache
 
-# Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -27,8 +27,14 @@ WORKDIR /var/www/html
 # Copy project files
 COPY . .
 
-# Install dependencies
+# Install Composer dependencies
 RUN composer install --no-dev --optimize-autoloader
+
+# Create Drupal required directories
+RUN mkdir -p web/sites/default/files \
+    && cp web/sites/default/default.settings.php web/sites/default/settings.php \
+    && chmod -R 777 web/sites/default/files \
+    && chmod 666 web/sites/default/settings.php
 
 # Set document root
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/web
